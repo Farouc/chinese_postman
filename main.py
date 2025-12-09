@@ -16,7 +16,7 @@ import networkx as nx
 from tqdm import tqdm
 
 # ============================================================
-# Paramètres par défaut
+# Default params
 # ============================================================
 DEFAULT_MAX_DP_K = 24 # max k for exact algo DP (open)
 DEFAULT_KNN_M = 16 # nb of neighbors for heuristic algorithm (closed)
@@ -296,7 +296,7 @@ def hierholzer_eulerian_trail(mg: MultiGraph, start=None) -> List:
 
 
 # ============================================================
-# Appariment exact (DP bitmask) pour k petit
+# Exact matching (DP bitmask) for small k
 # ============================================================
 
 def min_perfect_matching_cost_dp(odd_ids: List, dist_matrix: Dict) -> Tuple[float, List[Tuple]]:
@@ -348,7 +348,7 @@ def min_perfect_matching_cost_dp(odd_ids: List, dist_matrix: Dict) -> Tuple[floa
     return dp(full_mask)
 
 # ============================================================
-# Duplication & construction multigraphe
+# Duplication & multigraph construction
 # ============================================================
 
 def duplicate_path_on_multigraph(mg: MultiGraph, path: List):
@@ -368,7 +368,7 @@ def build_multigraph_from_edges(vertices: List, uv_edges: List[Tuple]) -> MultiG
     return mg
 
 # ============================================================
-# Distances entre impairs (all-pairs) — pour k petit
+# Odd-pair distances — for small k
 # ============================================================
 
 def all_pairs_shortest_for_odds(vertices: List, uvw_edges: List[Tuple], odd_list: List) -> Tuple[Dict, Dict, Dict]:
@@ -390,7 +390,7 @@ def all_pairs_shortest_for_odds(vertices: List, uvw_edges: List[Tuple], odd_list
     return parents, dists, dist_matrix
 
 # ============================================================
-# k-NN Dijkstra tronqué — pour k grand
+# k-NN troncated Dijkstra — for large k 
 # ============================================================
 
 def dijkstra_k_nearest_odds(adj_w: Dict, source, odd_set: set, m: int):
@@ -587,7 +587,7 @@ def solve_large_k_closed_sparse(vertices: List, edges: List[Tuple], odds: List, 
     return tour, meta
 
 # ============================================================
-# Orchestration avec arguments
+# Orchestration
 # ============================================================
 
 def solve_eulerian_with_args(vertices: List, edges: List[Tuple], args) -> Tuple[List, Dict]:
@@ -602,7 +602,7 @@ def solve_eulerian_with_args(vertices: List, edges: List[Tuple], args) -> Tuple[
     adj = build_adj_list_all_vertices(vertices, uv)
     timings["build_adj_sec"] = round(time.time() - t0, 3)
 
-    # Connexité
+    # Connexity
     t1 = time.time()
     if not is_connected_on_non_isolated(adj):
         logging.error("Graph is not connected on its non-isolated component set; no eulerian trail exists.")
@@ -613,7 +613,7 @@ def solve_eulerian_with_args(vertices: List, edges: List[Tuple], args) -> Tuple[
     k = len(odds)
     logging.info(f"Odd-degree vertices: k={k}")
 
-    # k == 0 : circuit direct
+    # k == 0 : 
     if k == 0:
         mg = build_multigraph_from_edges(vertices, uv)
         start = 0 if (0 in mg.vertices and mg.degree(0) > 0) else (next(iter(non_isolated_vertices(adj))) if non_isolated_vertices(adj) else None)
@@ -630,7 +630,7 @@ def solve_eulerian_with_args(vertices: List, edges: List[Tuple], args) -> Tuple[
             return trail, {**meta, "timings_sec": timings}
         return tour, {**meta, "timings_sec": timings}
 
-    # k == 2 : chemin direct
+    # k == 2 : 
     if k == 2:
         mg = build_multigraph_from_edges(vertices, uv)
         s = odds[0]
